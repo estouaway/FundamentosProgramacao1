@@ -20,11 +20,18 @@ public class Library {
 
     // Método para carregar os livros a partir de um ficheiro
     private void loadBooks() throws IOException {
+        File file = new File("BooksFile");
+
+        // Check if the file exists, if not, create an empty one
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
         String[] tempAuthors = new String[100];
         Book[][] tempBooks = new Book[100][];
         int authorCount = 0;
 
-        BufferedReader reader = new BufferedReader(new FileReader("BooksFile"));
+        BufferedReader reader = new BufferedReader(new FileReader(file));
         String line;
 
         while ((line = reader.readLine()) != null) {

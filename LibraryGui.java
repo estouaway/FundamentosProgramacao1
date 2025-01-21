@@ -147,7 +147,7 @@ public class LibraryGui {
                 JOptionPane.showMessageDialog(frame, "Livro devolvido com sucesso!");
                 refreshBookList();
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(frame, "Error returning book.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Erro a devolver livro.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -166,12 +166,12 @@ public class LibraryGui {
                 }
 
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(frame, "Erro a eliminar livro: " + e.getMessage());
+                JOptionPane.showMessageDialog(frame, "Erro a requisitar livro: " + e.getMessage());
             }
 
             refreshLists();
         } else {
-            JOptionPane.showMessageDialog(frame, "Selecione um livro para apagar.");
+            JOptionPane.showMessageDialog(frame, "Selecione um livro para requisitar.");
         }
     }
 
