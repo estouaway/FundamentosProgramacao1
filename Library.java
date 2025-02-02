@@ -1,12 +1,20 @@
 import java.io.*;
 import java.util.Arrays;
 
+/**
+ * Classe que representa a biblioteca.
+ * Gere os livros e autores, e permite adicionar, remover, requisitar e devolver livros.
+ * Carrega e guarda as informações dos livros a partir de um ficheiro.
+ */
 public class Library {
 
     private String[] authors;  // Array para guardar os autores
-    private Book[][] books;    // 2D Array para guardar os livros, cada autor tem os seus livros
+    private Book[][] books;    // Array bidimensional para guardar os livros, cada autor tem os seus livros
 
-    // Constructor
+    /**
+     * Construtor da classe Library.
+     * Inicializa os arrays de autores e livros e carrega tudo a partir de um ficheiro.
+     */
     public Library() {
         authors = new String[0];
         books = new Book[0][0];
@@ -18,13 +26,21 @@ public class Library {
         }
     }
 
-    // Método para carregar os livros a partir de um ficheiro
+    /**
+     * Método para carregar os livros a partir de um ficheiro.
+     * Se o ficheiro não existir, cria um novo ficheiro vazio.
+     *
+     * @throws IOException Se ocorrer um erro ao ler o ficheiro ou a criar.
+     */
     private void loadBooks() throws IOException {
         File file = new File("BooksFile");
 
-        // Check if the file exists, if not, create an empty one
+        // Verifica se o ficheiro existe, se não, cria um vazio
         if (!file.exists()) {
-            file.createNewFile();
+            boolean fileCreated = file.createNewFile();
+            if (!fileCreated) {
+                throw new IOException("Erro a criar ficheiro.");
+            }
         }
 
         String[] tempAuthors = new String[100];
@@ -34,6 +50,7 @@ public class Library {
         BufferedReader reader = new BufferedReader(new FileReader(file));
         String line;
 
+        // Lê cada linha do ficheiro e processa os dados
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(";");
             if (parts.length == 3) {
@@ -44,14 +61,14 @@ public class Library {
                 int authorIndex = findAuthorIndex(tempAuthors, author, authorCount);
 
                 if (authorIndex == -1) {
-                    // New author found
+                    // Novo autor encontrado
                     tempAuthors[authorCount] = author;
                     tempBooks[authorCount] = new Book[100];
                     authorIndex = authorCount;
                     authorCount++;
                 }
 
-                // Add book for the author
+                // Adiciona livro para o autor
                 int bookCount = getBookCount(tempBooks[authorIndex]);
                 tempBooks[authorIndex][bookCount] = new Book(title, available);
             }
@@ -68,6 +85,14 @@ public class Library {
         }
     }
 
+    /**
+     * Método que encontra o índice de um autor no array de autores.
+     *
+     * @param authors Lista de autores.
+     * @param author Nome do autor a procurar.
+     * @param count Número de autores atualmente na lista.
+     * @return O índice do autor ou -1 se o autor não for encontrado.
+     */
     private int findAuthorIndex(String[] authors, String author, int count) {
         for (int i = 0; i < count; i++) {
             if (authors[i].equals(author)) {
@@ -77,6 +102,12 @@ public class Library {
         return -1;
     }
 
+    /**
+     * Método que conta quantos livros existem em um array de livros.
+     *
+     * @param books Array de livros.
+     * @return O número de livros no array.
+     */
     private int getBookCount(Book[] books) {
         int count = 0;
         for (Book book : books) {
@@ -87,18 +118,43 @@ public class Library {
         return count;
     }
 
+    /**
+     * Retorna a lista de autores da biblioteca.
+     *
+     * @return Array com os nomes dos autores.
+     */
     public String[] getAuthors() {
         return authors;
     }
 
+    /**
+     * Retorna a lista de livros de um autor específico.
+     *
+     * @param authorIndex Índice do autor na lista de autores.
+     * @return Array de livros do autor.
+     */
     public Book[] getBooksByAuthor(int authorIndex) {
         return books[authorIndex];
     }
 
+    /**
+     * Verifica a disponibilidade de um livro.
+     *
+     * @param authorIndex Índice do autor na lista de autores.
+     * @param bookIndex Índice do livro na lista de livros do autor.
+     * @return True se o livro estiver disponível, false caso contrário.
+     */
     public boolean getAvailability(int authorIndex, int bookIndex) {
         return books[authorIndex][bookIndex].isAvailable();
     }
 
+    /**
+     * Adiciona um novo livro à biblioteca.
+     *
+     * @param author Nome do autor do livro.
+     * @param title Título do livro.
+     * @throws IOException Se ocorrer um erro ao salvar os livros no ficheiro.
+     */
     public void addBook(String author, String title) throws IOException {
         int authorIndex = findAuthorIndex(authors, author, authors.length);
         if (authorIndex == -1) {
@@ -116,6 +172,13 @@ public class Library {
         saveBooksToFile();
     }
 
+    /**
+     * Remove um livro da biblioteca.
+     *
+     * @param author Nome do autor do livro.
+     * @param title Título do livro.
+     * @throws IOException Se ocorrer um erro ao salvar os livros no ficheiro.
+     */
     public void removeBook(String author, String title) throws IOException {
         int authorIndex = findAuthorIndex(authors, author, authors.length);
         if (authorIndex == -1) {
@@ -152,6 +215,14 @@ public class Library {
         saveBooksToFile();
     }
 
+    /**
+     * Requisita um livro da biblioteca.
+     *
+     * @param author Nome do autor do livro.
+     * @param title Título do livro.
+     * @return True se o livro foi requisitado com sucesso, false caso contrário.
+     * @throws IOException Se ocorrer um erro ao salvar os livros no ficheiro.
+     */
     public boolean requestBook(String author, String title) throws IOException {
         int authorIndex = findAuthorIndex(authors, author, authors.length);
         if (authorIndex == -1) {
@@ -185,6 +256,13 @@ public class Library {
         return true;
     }
 
+    /**
+     * Devolve um livro para a biblioteca.
+     *
+     * @param author Nome do autor do livro.
+     * @param title Título do livro.
+     * @throws IOException Se ocorrer um erro ao salvar os livros no ficheiro.
+     */
     public void returnBook(String author, String title) throws IOException {
         int authorIndex = findAuthorIndex(authors, author, authors.length);
         if (authorIndex == -1) {
@@ -213,6 +291,12 @@ public class Library {
         saveBooksToFile();
     }
 
+    /**
+     * Método para salvar os livros no ficheiro.
+     * Sobrescreve o conteúdo do ficheiro com a lista atualizada de livros.
+     *
+     * @throws IOException Se ocorrer um erro ao escrever no ficheiro.
+     */
     private void saveBooksToFile() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("BooksFile"))) {
             for (int i = 0; i < authors.length; i++) {

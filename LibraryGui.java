@@ -4,6 +4,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
+/**
+ * Classe responsável pela interface gráfica da aplicação de gestão de biblioteca.
+ * Exibe a lista de autores e livros, e permite que os utilizadores, dependendo do tipo (estudante ou professor),
+ * realizem ações como requisitar, devolver, adicionar e remover livros.
+ */
 public class LibraryGui {
     private final JFrame frame;
     private final User user;
@@ -12,6 +17,12 @@ public class LibraryGui {
     private JList<Book> bookList;
     private DefaultListModel<Book> bookListModel;
 
+    /**
+     * Construtor da classe LibraryGui.
+     * Inicializa a janela principal da aplicação e configura os componentes gráficos.
+     *
+     * @param user O utilizador que está a utilizar a aplicação (pode ser estudante ou professor).
+     */
     public LibraryGui(User user) {
         this.user = user;
 
@@ -29,6 +40,12 @@ public class LibraryGui {
         frame.setVisible(true);
     }
 
+    /**
+     * Configura os componentes da interface gráfica, incluindo os painéis, listas de autores e livros,
+     * e os botões de ação para estudantes e professores.
+     *
+     * @param panel O painel principal onde os componentes serão adicionados.
+     */
     private void placeComponents(JPanel panel) {
         JPanel topPanel = new JPanel(new BorderLayout());
 
@@ -50,7 +67,7 @@ public class LibraryGui {
         panel.getActionMap().put("showAboutMessage", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(panel, "Aplicação de Biblioteca - Versão 1.0\nCriado por: \nCarlos Dias\nJosé Rua\nJoão Gonçalo Antunes", "Acerca", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(panel, "Aplicação de Biblioteca - Versão 1.0\nCriado por: \nCarlos Dias\nCarlos Vieira\nJoão Gonçalo Antunes", "Acerca", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -58,13 +75,13 @@ public class LibraryGui {
         DefaultListModel<String> authorListModel = new DefaultListModel<>();
         bookListModel = new DefaultListModel<>();
 
-        // Criar a JList que é a representacao visual dos autores
+        // Criar a JList que é a representação visual dos autores
         authorList = new JList<>(authorListModel);
         authorList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane authorScrollPane = new JScrollPane(authorList);
         panel.add(authorScrollPane, BorderLayout.WEST);
 
-        // // Criar a JList que é a representacao visual dos livros
+        // Criar a JList que é a representação visual dos livros
         bookList = new JList<>(bookListModel);
         bookList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane bookScrollPane = new JScrollPane(bookList);
@@ -75,12 +92,12 @@ public class LibraryGui {
             authorListModel.addElement(author);
         }
 
-        // setup dos botoes de acoes
+        // setup dos botões de ações
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
 
         if (user instanceof Student) {
-            //botoes para os estudantes
+            //botões para os estudantes
             JButton requestBtn = new JButton("Requisitar");
             JButton returnBtn = new JButton("Devolver");
             returnBtn.setEnabled(false);
@@ -95,7 +112,7 @@ public class LibraryGui {
                 returnBook();
             });
 
-            // Enable/Disable do botao de requisitar livros sempre que a selecao de livro muda
+            // Enable/Disable do botão de requisitar livros sempre que a seleção de livro muda
             bookList.addListSelectionListener(e -> {
                 if (!e.getValueIsAdjusting()) {
                     Book selectedBook = bookList.getSelectedValue();
@@ -106,13 +123,13 @@ public class LibraryGui {
                 }
             });
 
-            // Disable do botao de requisitar livros sempre que a selecao de autor muda
+            // Disable do botão de requisitar livros sempre que a seleção de autor muda
             authorList.addListSelectionListener(e -> {
                 returnBtn.setEnabled(false);
             });
 
         } else if (user instanceof Teacher) {
-            //botoes para os professores
+            //botões para os professores
             JButton addBtn = new JButton("Adicionar");
             JButton removeBtn = new JButton("Remover");
             buttonPanel.add(addBtn);
@@ -131,13 +148,16 @@ public class LibraryGui {
         authorList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 refreshBookList();
-
             }
         });
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Método responsável por devolver o livro selecionado.
+     * Atualiza a interface para refletir a devolução do livro.
+     */
     private void returnBook() {
         Book selectedBook = bookList.getSelectedValue();
 
@@ -152,16 +172,18 @@ public class LibraryGui {
         }
     }
 
+    /**
+     * Método responsável por requisitar o livro selecionado.
+     * Atualiza a interface para refletir a requisição do livro.
+     */
     private void requestBook() {
         Book selectedBook = bookList.getSelectedValue();
         if (selectedBook != null) {
             try {
                 boolean requested = ((Student) user).requestBook(selectedBook);
                 if (requested) {
-
                     JOptionPane.showMessageDialog(frame, "Livro requisitado.");
                 } else {
-
                     JOptionPane.showMessageDialog(frame, "Erro ao requisitar livro.");
                 }
 
@@ -175,13 +197,16 @@ public class LibraryGui {
         }
     }
 
+    /**
+     * Método responsável por remover o livro selecionado.
+     * Este método é usado apenas por professores.
+     */
     private void removeBook() {
         String selectedAuthor = authorList.getSelectedValue();
         Book selectedBook = bookList.getSelectedValue();
         if (selectedAuthor != null && selectedBook != null) {
             try {
                 ((Teacher) user).removeBook(selectedAuthor, selectedBook.getTitle());
-
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(frame, "Erro a eliminar livro: " + e.getMessage());
             }
@@ -192,6 +217,10 @@ public class LibraryGui {
         }
     }
 
+    /**
+     * Método responsável por adicionar um livro.
+     * Este método é usado apenas por professores.
+     */
     private void addBook() {
         JTextField authorField = new JTextField(20);
         JTextField titleField = new JTextField(20);
@@ -225,6 +254,9 @@ public class LibraryGui {
         }
     }
 
+    /**
+     * Método responsável por atualizar as listas de autores e livros na interface gráfica.
+     */
     private void refreshLists() {
         String selectedAuthor = authorList.getSelectedValue();
         DefaultListModel<String> authorModel = (DefaultListModel<String>) authorList.getModel();
@@ -244,6 +276,9 @@ public class LibraryGui {
         refreshBookList();
     }
 
+    /**
+     * Método responsável por atualizar a lista de livros exibida de acordo com o autor selecionado.
+     */
     private void refreshBookList() {
         bookListModel.clear();
 
